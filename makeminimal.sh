@@ -42,4 +42,4 @@ installed=( $(rpm -qa --qf "%{NAME}\n" | sort -u) )
 
 delete=( $(comm -13 <(printf '%s\n' "${all_needed[@]}") <(printf '%s\n' "${installed[@]}")) )
 
-echo "${delete[@]}"
+yum remove "${delete[@]}"
