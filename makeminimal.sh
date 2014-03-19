@@ -1,4 +1,6 @@
-get_packages_for_group () {
+#!/usr/bin/env bash
+
+pkgs () {
   group=${1}
   result=()
   section=0
@@ -22,20 +24,17 @@ get_packages_for_group () {
         result+=($line)
       fi
     fi
-  done < <(yum group info core 2>/dev/null)
+  done < <(yum group info ${group} 2>/dev/null)
   echo "${result[@]}"
 }
 
-base=( $(get_packages_for_group 'base') )
-core=( $(get_packages_for_group 'core') )
+core=( $(pkgs 'core') )
+base=( $(pkgs 'base') )
 
-echo "BASE:"
-for pkg in "${base[@]}"; do
-  echo ${pkg}
-done
-echo -e "\n\n"
+#install_packages=( "${core[@]}" "${base[@]}" )
+#printf '%s\n' "${core[@]}" "${base[@]}" | sort -u
+printf '%s\n' $(pkgs 'core') $(pkgs 'base') | sort -u
 
-echo "CORE:"
-for pkg in "${core[@]}"; do
-  echo ${pkg}
-done
+#for pkg in "${install_packages[@]}"; do
+#  echo ${pkg}
+#done
