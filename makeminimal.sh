@@ -37,9 +37,24 @@ done
 deps_needed=( $(printf '%s\n' "${deps_needed[@]}" | sort -u) )
 
 all_needed=( $(printf '%s\n' "${pkgs_needed[@]}" "${deps_needed[@]}" | sort -u) )
+echo "Packages Needed:"
+printf '%0.s*' $(seq 1 $(tput cols))
+echo "${all_needed[@]}"
 
-installed=( $(rpm -qa --qf "%{NAME}\n" | sort -u) )
+all_installed=( $(rpm -qa --qf "%{NAME}\n" | sort -u) )
+echo -e "\n\n\nPackages Installed:"
+printf '%0.s*' $(seq 1 $(tput cols))
+echo "${all_installed[@]}"
 
-delete=( $(comm -13 <(printf '%s\n' "${all_needed[@]}") <(printf '%s\n' "${installed[@]}")) )
+delete=( $(comm -13 <(printf '%s\n' "${all_needed[@]}") <(printf '%s\n' "${all_installed[@]}")) )
+echo -e "\n\n\nPackages to Delete:"
+printf '%0.s*' $(seq 1 $(tput cols))
+echo "${delete[@]}"
 
-yum remove "${delete[@]}"
+install=( $(comm -23 <(printf '%s\n' "${all_needed[@]}") <(printf '%s\n' "${all_installed[@]}")) )
+echo -e "\n\n\nPackages to Install:"
+printf '%0.s*' $(seq 1 $(tput cols))
+echo "${delete[@]}"
+
+#yum autoremove -y "${delete[@]}"
+#yum install -y "${install[@]}"
