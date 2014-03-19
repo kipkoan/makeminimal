@@ -28,13 +28,18 @@ pkgs () {
   echo "${result[@]}"
 }
 
-core=( $(pkgs 'core') )
-base=( $(pkgs 'base') )
+pkgs_needed=( $(printf '%s\n' $(pkgs 'core') $(pkgs 'base') | sort -u) )
 
-#install_packages=( "${core[@]}" "${base[@]}" )
-#printf '%s\n' "${core[@]}" "${base[@]}" | sort -u
-printf '%s\n' $(pkgs 'core') $(pkgs 'base') | sort -u
+deps_needed=()
+for pkg in "${pkgs_needed[@]}"; do
+  deps_needed+=( $(yum deplist ${pkg} | grep provider: | awk '{print $2}' | sed -r 's/\.noarch|\.i686|\.x86_64//g') )
+done
+deps_needed=( $(printf '%s\n' "${deps_needed[@]}" | sort -u) )
 
-#for pkg in "${install_packages[@]}"; do
-#  echo ${pkg}
-#done
+all_needed=( $(printf '%s\n' "${pkgs_needed[@]}" "${deps_needed[@]}" | sort -u) )
+
+installed=( $(rpm -qa --qf "%{NAME}\n" | sort -u) )
+
+delete=( $(comm -13 <(printf '%s\n' "${all_needed[@]}") <(printf '%s\n' "${installed[@]}")) )
+
+echo "${delete[@]}"
