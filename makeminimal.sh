@@ -54,7 +54,7 @@ echo "${delete[@]}"
 install=( $(comm -23 <(printf '%s\n' "${all_needed[@]}") <(printf '%s\n' "${all_installed[@]}")) )
 echo -e "\n\n\nPackages to Install:"
 printf '%0.s*' $(seq 1 $(tput cols))
-echo "${delete[@]}"
+echo "${install[@]}"
 
-#yum autoremove -y "${delete[@]}"
-#yum install -y "${install[@]}"
+yum autoremove "${delete[@]}"
+yum install "${install[@]}"
