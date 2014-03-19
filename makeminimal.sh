@@ -32,7 +32,7 @@ pkgs_needed=( $(printf '%s\n' $(pkgs 'core') $(pkgs 'base') | sort -u) )
 
 deps_needed=()
 for pkg in "${pkgs_needed[@]}"; do
-  deps_needed+=( $(yum deplist ${pkg} | grep provider: | awk '{print $2}' | sed -r 's/\.noarch|\.i686|\.x86_64//g') )
+  deps_needed+=( $(repoquery --requires --recursive --resolve --qf "%{NAME}" ${pkg}) )
 done
 deps_needed=( $(printf '%s\n' "${deps_needed[@]}" | sort -u) )
 
